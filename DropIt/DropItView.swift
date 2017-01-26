@@ -36,13 +36,11 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        print(num)
-        num += 1
         
         let path = UIBezierPath(ovalIn: CGRect(center: bounds.mid, size: dropSize))
         dropBehavior.addBarrier(path: path, name: PathNames.MiddleBarrier)
         
-        bezierPaths["mid"] = path
+        bezierPaths[PathNames.MiddleBarrier] = path
         
     }
     

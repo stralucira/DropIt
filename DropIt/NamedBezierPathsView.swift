@@ -15,12 +15,12 @@ class NamedBezierPathsView: UIView {
             UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1).setStroke()
             UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1).setFill()
             path.stroke()
+            path.fill()
         }
     }
     
     var bezierPaths = [String:UIBezierPath]() {
         didSet {
-            
             setNeedsDisplay()
         }
     }
