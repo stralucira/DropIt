@@ -20,6 +20,12 @@ class DropItView: UIView {
 
     func addDrop() {
         var frame = CGRect(origin: CGPoint.zero, size: dropSize)
-        frame.origin.x
+        
+        frame.origin.x = CGFloat.random(max: dropsPerRow) * dropSize.width
+        
+        let drop = UIView(frame: frame)
+        drop.backgroundColor = UIColor.random
+        
+        addSubview(drop)
     }
 }
