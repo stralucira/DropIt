@@ -8,7 +8,7 @@
 
 import UIKit
 
-class DropItView: UIView, UIDynamicAnimatorDelegate {
+class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
 
     private let dropBehavior = FallingObjectBehavior()
     
@@ -39,6 +39,8 @@ class DropItView: UIView, UIDynamicAnimatorDelegate {
         
         let path = UIBezierPath(ovalIn: CGRect(center: bounds.mid, size: dropSize))
         dropBehavior.addBarrier(path: path, name: PathNames.MiddleBarrier)
+        
+        bezierPaths[PathNames.MiddleBarrier] = path
     }
     
     func dynamicAnimatorDidPause(_ animator: UIDynamicAnimator) {
@@ -80,7 +82,6 @@ class DropItView: UIView, UIDynamicAnimatorDelegate {
         }
         
     }
-    
     
     private let dropsPerRow = 10
     
