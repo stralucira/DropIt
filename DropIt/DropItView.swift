@@ -10,6 +10,22 @@ import UIKit
 
 class DropItView: UIView {
 
+    private let gravity = UIGravityBehavior()
+    
+    private lazy var animator: UIDynamicAnimator = UIDynamicAnimator(referenceView: self)
+    
+    var animating: Bool = false {
+        
+        didSet {
+            if animating {
+                animator.addBehavior(gravity)
+            } else {
+                animator.removeBehavior(gravity)
+            }
+        }
+        
+    }
+    
     
     private let dropsPerRow = 10
     
