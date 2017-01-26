@@ -29,7 +29,18 @@ class DropItView: UIView, UIDynamicAnimatorDelegate {
         }
         
     }
+    struct PathNames {
+        
+        static let MiddleBarrier = "Middle Barrier"
+    }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        let path = UIBezierPath(ovalIn: CGRect(center: bounds.mid, size: dropSize))
+        dropBehavior.addBarrier(path: path, name: PathNames.MiddleBarrier)
+    }
+    
     func dynamicAnimatorDidPause(_ animator: UIDynamicAnimator) {
         removeCompletedRow()
     }

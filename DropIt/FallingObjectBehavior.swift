@@ -25,6 +25,11 @@ class FallingObjectBehavior: UIDynamicBehavior {
         return dib
     }()
     
+    func addBarrier(path: UIBezierPath, name: String) {
+        collider.removeBoundary(withIdentifier: name as NSCopying)
+        collider.addBoundary(withIdentifier: name as NSCopying, for: path)
+    }
+    
     override init() {
         super.init()
         
