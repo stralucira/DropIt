@@ -8,11 +8,15 @@
 
 import UIKit
 
-class DropItView: UIView {
+class DropItView: UIView, UIDynamicAnimatorDelegate {
 
     private let dropBehavior = FallingObjectBehavior()
     
-    private lazy var animator: UIDynamicAnimator = UIDynamicAnimator(referenceView: self)
+    private lazy var animator: UIDynamicAnimator = {
+        let _animator = UIDynamicAnimator(referenceView: self)
+        _animator.delegate = self
+        return _animator
+    }()
     
     var animating: Bool = false {
         
@@ -22,6 +26,46 @@ class DropItView: UIView {
             } else {
                 animator.removeBehavior(dropBehavior)
             }
+        }
+        
+    }
+
+    func dynamicAnimatorDidPause(_ animator: UIDynamicAnimator) {
+        removeCompletedRow()
+    }
+    
+    private func removeCompletedRow(){
+        var dropsToRemove = [UIView]()
+        
+        var hitTestRect = CGRect(origin: bounds.lowerLeft, size: dropSize)
+        
+        repeat {
+            hitTestRect.origin.x = bounds.minX
+            hitTestRect.origin.y -= dropSize.height
+            
+            var dropsTested = 0
+            var dropsFound = [UIView]()
+            
+            while dropsTested < dropsPerRow {
+                if let hitView = hitTest(p: hitTestRect.mid) , hitView.superview == self {
+                    dropsFound.append(hitView)
+                } else {
+                    break
+                }
+                hitTestRect.origin.x += dropSize.width
+                dropsTested += 1
+                
+            }
+            
+            if dropsTested == dropsPerRow {
+                dropsToRemove += dropsFound
+            }
+            
+        } while (dropsToRemove.count == 0 && hitTestRect.origin.y > bounds.minY)
+        
+        for drop in dropsToRemove {
+            dropBehavior.removeItem(item: drop)
+            drop.removeFromSuperview()
         }
         
     }
@@ -35,14 +79,13 @@ class DropItView: UIView {
     }
 
     func addDrop() {
+        
         var frame = CGRect(origin: CGPoint.zero, size: dropSize)
         
         frame.origin.x = CGFloat.random(max: dropsPerRow) * dropSize.width
         
         let drop = UIView(frame: frame)
         drop.backgroundColor = UIColor.random
-        
-        print(drop.transform)
         
         addSubview(drop)
         dropBehavior.addItem(item: drop)
