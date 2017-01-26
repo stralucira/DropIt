@@ -10,18 +10,16 @@ import UIKit
 
 class NamedBezierPathsView: UIView {
 
-    
-
     override func draw(_ rect: CGRect) {
         for (_,path) in bezierPaths {
             path.stroke()
         }
     }
- 
     
     var bezierPaths = [String:UIBezierPath]() {
         didSet {
-            setNeedsLayout()
+            
+            setNeedsDisplay()
         }
     }
 

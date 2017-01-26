@@ -19,7 +19,6 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
     }()
     
     var animating: Bool = false {
-        
         didSet {
             if animating {
                 animator.addBehavior(dropBehavior)
@@ -29,18 +28,22 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
         }
         
     }
+    
     struct PathNames {
-        
         static let MiddleBarrier = "Middle Barrier"
     }
-
+    var num: Int = 0
+    
     override func layoutSubviews() {
         super.layoutSubviews()
+        print(num)
+        num += 1
         
         let path = UIBezierPath(ovalIn: CGRect(center: bounds.mid, size: dropSize))
         dropBehavior.addBarrier(path: path, name: PathNames.MiddleBarrier)
         
-        bezierPaths[PathNames.MiddleBarrier] = path
+        bezierPaths["mid"] = path
+        
     }
     
     func dynamicAnimatorDidPause(_ animator: UIDynamicAnimator) {

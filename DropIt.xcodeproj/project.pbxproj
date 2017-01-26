@@ -64,7 +64,6 @@
 			children = (
 				7C8971081E3A538000E874F5 /* FallingObjectBehavior.swift */,
 				7C351D6F1E3A3EB7004C8750 /* Supporting Files */,
-				7C351D611E3A3E75004C8750 /* Main.storyboard */,
 				7C351D701E3A3F02004C8750 /* DropItView.swift */,
 				7C89710A1E3A7FC200E874F5 /* NamedBezierPathsView.swift */,
 				7C351D721E3A3F39004C8750 /* DropItViewController.swift */,
@@ -76,6 +75,7 @@
 		7C351D6F1E3A3EB7004C8750 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				7C351D611E3A3E75004C8750 /* Main.storyboard */,
 				7C351D5D1E3A3E75004C8750 /* AppDelegate.swift */,
 				7C351D641E3A3E75004C8750 /* Assets.xcassets */,
 				7C351D661E3A3E75004C8750 /* LaunchScreen.storyboard */,
