@@ -26,13 +26,27 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
                 animator.removeBehavior(dropBehavior)
             }
         }
-        
     }
     
     struct PathNames {
         static let MiddleBarrier = "Middle Barrier"
     }
-    var num: Int = 0
+    
+    private var attachment: UIAttachmentBehavior? {
+        willSet {
+            if attachment != nil {
+                animator.removeBehavior(attachment!)
+            }
+        }
+        
+        didSet{
+            if attachment != nil {
+                animator.addBehavior(attachment!)
+            }
+        }
+    }
+    
+    private var lastDrop: UIView?
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -46,6 +60,25 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
     
     func dynamicAnimatorDidPause(_ animator: UIDynamicAnimator) {
         removeCompletedRow()
+    }
+    
+    func grapDrop(recognizer: UIPanGestureRecognizer) {
+        let gesturePoint = recognizer.location(in: self)
+        
+        switch recognizer.state {
+            
+        case .began:
+            //Create the attachment.
+            if let dropToAttachTo = lastDrop, dropToAttachTo.superview != nil {
+                attachment = UIAttachmentBehavior(item: dropToAttachTo, attachedToAnchor: gesturePoint)
+                lastDrop = nil
+            }
+        case .changed:
+            // Change the attachment anchor point.
+            attachment?.anchorPoint = gesturePoint
+        default:
+            attachment = nil
+        }
     }
     
     private func removeCompletedRow(){
@@ -92,7 +125,6 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
     }
 
     func addDrop() {
-        
         var frame = CGRect(origin: CGPoint.zero, size: dropSize)
         
         frame.origin.x = CGFloat.random(max: dropsPerRow) * dropSize.width
@@ -102,5 +134,6 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
         
         addSubview(drop)
         dropBehavior.addItem(item: drop)
+        lastDrop = drop
     }
 }
