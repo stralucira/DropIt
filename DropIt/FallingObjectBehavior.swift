@@ -10,7 +10,7 @@ import UIKit
 
 class FallingObjectBehavior: UIDynamicBehavior {
 
-    private let gravity = UIGravityBehavior()
+    let gravity = UIGravityBehavior()
     
     private let collider: UICollisionBehavior = {
         let _collider = UICollisionBehavior()

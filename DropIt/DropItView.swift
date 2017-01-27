@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreMotion
 
 class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
 
@@ -22,6 +23,7 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
         didSet {
             if animating {
                 animator.addBehavior(dropBehavior)
+                updateRealGravity()
             } else {
                 animator.removeBehavior(dropBehavior)
             }
@@ -45,12 +47,47 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
                 animator.addBehavior(attachment!)
                 attachment!.action = {
                     [unowned self] in
-                    
                     if let attachedDrop = self.attachment!.items.first as? UIView {
                         self.bezierPaths["Attachment"] = UIBezierPath.lineFrom(from: self.attachment!.anchorPoint, to: attachedDrop.center)
                     }
                 }
             }
+        }
+    }
+    
+    var realGravity: Bool = false {
+        didSet {
+            updateRealGravity()
+        }
+    }
+    
+    private var motionManager = CMMotionManager()
+    
+    private func updateRealGravity() {
+        if realGravity {
+            if motionManager.isAccelerometerAvailable && !motionManager.isAccelerometerActive {
+                motionManager.accelerometerUpdateInterval = 0.25
+                motionManager.startAccelerometerUpdates(to: .main, withHandler: {
+                    [unowned self] (data, error) in
+                    if self.dropBehavior.dynamicAnimator != nil {
+                        if var dx = data?.acceleration.x, var dy = data?.acceleration.y {
+                            
+                            switch UIDevice.current.orientation {
+                            case .portrait: dy = -dy
+                            case .portraitUpsideDown: break
+                            case .landscapeRight: swap (&dx, &dy)
+                            case .landscapeLeft: swap(&dx, &dy); dy = -dy
+                            default: dx = 0; dy = 0;
+                            }
+                            
+                            
+                            self.dropBehavior.gravity.gravityDirection = CGVector(dx: dx, dy: dy)
+                        }
+                    } else { self.motionManager.stopAccelerometerUpdates() }
+                })
+            }
+        } else {
+            motionManager.stopAccelerometerUpdates()
         }
     }
     
@@ -79,6 +116,8 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
             //Create the attachment.
             if let dropToAttachTo = lastDrop, dropToAttachTo.superview != nil {
                 attachment = UIAttachmentBehavior(item: dropToAttachTo, attachedToAnchor: gesturePoint)
+                attachment?.length = 150
+                //attachment?.damping = 1.5
                 lastDrop = nil
             }
         case .changed:
