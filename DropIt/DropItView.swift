@@ -11,6 +11,8 @@ import CoreMotion
 
 class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
 
+    private let dropsPerRow = Constants.dropsPerRow
+    
     private let dropBehavior = FallingObjectBehavior()
     
     private lazy var animator: UIDynamicAnimator = {
@@ -63,6 +65,7 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
     
     private var motionManager = CMMotionManager()
     
+    //Consider using guard let statements?
     private func updateRealGravity() {
         if realGravity {
             if motionManager.isAccelerometerAvailable && !motionManager.isAccelerometerActive {
@@ -71,7 +74,6 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
                     [unowned self] (data, error) in
                     if self.dropBehavior.dynamicAnimator != nil {
                         if var dx = data?.acceleration.x, var dy = data?.acceleration.y {
-                            
                             switch UIDevice.current.orientation {
                             case .portrait: dy = -dy
                             case .portraitUpsideDown: break
@@ -79,8 +81,6 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
                             case .landscapeLeft: swap(&dx, &dy); dy = -dy
                             default: dx = 0; dy = 0;
                             }
-                            
-                            
                             self.dropBehavior.gravity.gravityDirection = CGVector(dx: dx, dy: dy)
                         }
                     } else { self.motionManager.stopAccelerometerUpdates() }
@@ -102,7 +102,7 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
         bezierPaths[PathNames.MiddleBarrier] = path
         
     }
-    
+
     func dynamicAnimatorDidPause(_ animator: UIDynamicAnimator) {
         removeCompletedRow()
     }
@@ -116,7 +116,7 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
             //Create the attachment.
             if let dropToAttachTo = lastDrop, dropToAttachTo.superview != nil {
                 attachment = UIAttachmentBehavior(item: dropToAttachTo, attachedToAnchor: gesturePoint)
-                attachment?.length = 150
+                attachment?.length = Constants.attachmentLength
                 //attachment?.damping = 1.5
                 lastDrop = nil
             }
@@ -130,7 +130,6 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
     
     private func removeCompletedRow(){
         var dropsToRemove = [UIView]()
-        
         var hitTestRect = CGRect(origin: bounds.lowerLeft, size: dropSize)
         
         repeat {
@@ -148,23 +147,17 @@ class DropItView: NamedBezierPathsView, UIDynamicAnimatorDelegate {
                 }
                 hitTestRect.origin.x += dropSize.width
                 dropsTested += 1
-                
             }
-            
             if dropsTested == dropsPerRow {
                 dropsToRemove += dropsFound
             }
-            
         } while (dropsToRemove.count == 0 && hitTestRect.origin.y > bounds.minY)
         
         for drop in dropsToRemove {
             dropBehavior.removeItem(item: drop)
             drop.removeFromSuperview()
         }
-        
     }
-    
-    private let dropsPerRow = 10
     
     private var dropSize: CGSize {
         let size = bounds.size.width / CGFloat(dropsPerRow)
